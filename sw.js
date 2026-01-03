@@ -1,4 +1,4 @@
-const CACHE_NAME = 'event-countdown-v1';
+const CACHE_NAME = 'event-countdown-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,11 +7,18 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Force active immediately
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         return cache.addAll(urlsToCache);
       })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    clients.claim() // Take control of all clients immediately
   );
 });
 
@@ -24,20 +31,5 @@ self.addEventListener('fetch', (event) => {
         }
         return fetch(event.request);
       })
-  );
-});
-
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
   );
 });

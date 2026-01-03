@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import useLocalStorage from './hooks/useLocalStorage';
 import type { Event } from './types';
 import { DEFAULT_CATEGORY_KEYS } from './types';
@@ -37,6 +36,32 @@ const App: React.FC = () => {
   const [filter, setFilter] = useState<FilterType>('upcoming');
   const [sortOrder, setSortOrder] = useLocalStorage<SortOrder>('sortOrder', 'date-asc');
   const { t } = useLanguage();
+  
+  // PWA Install Prompt State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as any);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as any);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
 
   useNotificationScheduler(events, t);
   
@@ -196,6 +221,8 @@ const App: React.FC = () => {
           categories={categories}
           addCategory={addCategory}
           deleteCategory={deleteCategory}
+          deferredPrompt={deferredPrompt}
+          onInstallApp={handleInstallClick}
         />
     </div>
   );

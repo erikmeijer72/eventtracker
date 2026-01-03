@@ -1,10 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Event, DefaultCategory } from '../types';
 import { DEFAULT_CATEGORY_KEYS } from '../types';
 import ConfirmationModal from './ConfirmationModal';
-import { TrashIcon, StarIcon, CloseIcon, ArrowsExpandIcon, ArrowsContractIcon } from './icons';
+import { TrashIcon, StarIcon, CloseIcon, ArrowsExpandIcon, ArrowsContractIcon, CalendarIcon } from './icons';
 
 type SortOrder = 'date-asc' | 'date-desc' | 'name-asc' | 'name-desc';
 
@@ -18,11 +17,13 @@ interface SettingsModalProps {
   categories: string[];
   addCategory: (name: string) => boolean;
   deleteCategory: (name: string) => void;
+  deferredPrompt?: any;
+  onInstallApp?: () => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ 
   isOpen, onClose, events, setEvents, sortOrder, setSortOrder, 
-  categories, addCategory, deleteCategory 
+  categories, addCategory, deleteCategory, deferredPrompt, onInstallApp
 }) => {
   const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -250,6 +251,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           
           {/* Content */}
           <div className="overflow-y-auto p-6 space-y-5">
+            
+            {deferredPrompt && (
+              <div className="mb-4">
+                <button
+                  onClick={onInstallApp}
+                  className="w-full px-4 py-3 bg-indigo-700 text-white font-bold rounded-xl shadow-md hover:bg-indigo-800 transition-colors flex items-center justify-center gap-2"
+                >
+                  <CalendarIcon className="w-5 h-5" />
+                  Installeer App
+                </button>
+              </div>
+            )}
+
             <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl shadow-sm">
               <label className="text-sm font-medium text-slate-700">{t('fullscreenLabel')}</label>
               <button
