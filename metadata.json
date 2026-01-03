@@ -1,0 +1,5 @@
+{
+  "name": "Event Countdown",
+  "description": "A simple and beautiful offline-first event tracker. Add events, see countdowns, and manage your important dates without needing an internet connection.",
+  "requestFramePermissions": []
+}
